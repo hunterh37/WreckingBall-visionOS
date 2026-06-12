@@ -1,0 +1,60 @@
+name: WreckingBall
+options:
+  bundleIdPrefix: com.hunter
+  deploymentTarget:
+    visionOS: "2.0"
+
+packages:
+  ImmersiveTesting:
+    path: ../ImmersiveTesting
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+
+targets:
+  WreckingBall:
+    type: application
+    platform: visionOS
+    sources:
+      - WreckingBall
+    dependencies:
+      - package: ImmersiveTesting
+        product: ImmersiveTestingRuntime
+    info:
+      path: WreckingBall/Info.plist
+      properties:
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+          UISceneConfigurations: {}
+        NSHandsTrackingUsageDescription: >-
+          Your right hand drives the crane that swings the wrecking ball.
+        NSWorldSensingUsageDescription: >-
+          Used to place the crane and rubble in your space.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hunter.WreckingBall
+        GENERATE_INFOPLIST_FILE: false
+
+  WreckingBallTests:
+    type: bundle.unit-test
+    platform: visionOS
+    sources:
+      - WreckingBallTests
+    dependencies:
+      - target: WreckingBall
+      - package: ImmersiveTesting
+        product: ImmersiveTesting
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: true
+
+schemes:
+  WreckingBall:
+    build:
+      targets:
+        WreckingBall: all
+    test:
+      targets:
+        - WreckingBallTests

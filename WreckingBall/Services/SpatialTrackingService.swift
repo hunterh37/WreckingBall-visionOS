@@ -18,6 +18,23 @@ final class SpatialTrackingService: WorldTrackingProviding, HandTrackingProvidin
     private let session = ARKitSession()
     private let handProvider = HandTrackingProvider()
     private let worldProvider = WorldTrackingProvider()
+    private let sceneReconstruction = SceneReconstructionProvider()
+
+    /// Container for the scene-understanding collision mesh. Parent this under the physics
+    /// root (it carries `PhysicsSimulationComponent`) so the wrecking ball and rubble cubes
+    /// collide with real-world walls and furniture. One static child per `MeshAnchor`.
+    /// Off by default: the world-mesh bodies exist but are disabled, so demolition physics
+    /// ignores real walls until the player flips the toggle. Disabling the container disables
+    /// the collision/physics components on every mesh child it holds.
+    let sceneMeshRoot: Entity = {
+        let e = Entity()
+        e.name = "sceneUnderstandingMesh"
+        e.isEnabled = false
+        return e
+    }()
+
+    /// Entities keyed by the anchor that produced them, so updates replace and removals prune.
+    private var meshEntities: [UUID: ModelEntity] = [:]
 
     // Latest poses, refreshed by the update streams.
     private var rightIndexTip = Transform(translation: [0.25, 1.05, -0.45])
@@ -26,19 +43,72 @@ final class SpatialTrackingService: WorldTrackingProviding, HandTrackingProvidin
 
     // MARK: Session
 
-    /// Starts tracking and consumes hand updates until cancelled. Call from a `.task`
-    /// attached to the immersive view.
+    /// Starts tracking and consumes hand + scene-reconstruction updates until cancelled.
+    /// Call from a `.task` attached to the immersive view.
     func run() async {
         guard HandTrackingProvider.isSupported else { return }   // simulator: keep fakes-ish defaults
+
+        var providers: [any DataProvider] = [handProvider, worldProvider]
+        let meshingSupported = SceneReconstructionProvider.isSupported
+        if meshingSupported { providers.append(sceneReconstruction) }
+
         do {
-            try await session.run([handProvider, worldProvider])
+            try await session.run(providers)
         } catch {
             print("SpatialTrackingService failed to start: \(error)")
             return
         }
+
+        // Consume both anchor streams concurrently for the life of the session.
+        async let hands: Void = consumeHandUpdates()
+        async let mesh: Void = consumeMeshUpdates(enabled: meshingSupported)
+        _ = await (hands, mesh)
+    }
+
+    private func consumeHandUpdates() async {
         for await update in handProvider.anchorUpdates {
             guard update.event == .updated || update.event == .added else { continue }
             ingest(update.anchor)
+        }
+    }
+
+    private func consumeMeshUpdates(enabled: Bool) async {
+        guard enabled else { return }
+        for await update in sceneReconstruction.anchorUpdates {
+            await ingest(meshUpdate: update)
+        }
+    }
+
+    // MARK: Scene reconstruction → collision mesh
+
+    /// Turns a `MeshAnchor` update into a static collision/physics body so demolition
+    /// physics treats real walls and furniture as solid scenery.
+    private func ingest(meshUpdate update: AnchorUpdate<MeshAnchor>) async {
+        let anchor = update.anchor
+        switch update.event {
+        case .added, .updated:
+            guard let shape = try? await ShapeResource.generateStaticMesh(from: anchor) else { return }
+            let entity = meshEntities[anchor.id] ?? {
+                let e = ModelEntity()
+                e.name = "worldMesh_\(anchor.id.uuidString)"
+                meshEntities[anchor.id] = e
+                sceneMeshRoot.addChild(e)
+                return e
+            }()
+            entity.transform = Transform(matrix: anchor.originFromAnchorTransform)
+            entity.components.set(CollisionComponent(
+                shapes: [shape],
+                isStatic: true,
+                filter: CollisionFilter(group: GameCollision.scenery, mask: .all)
+            ))
+            entity.components.set(PhysicsBodyComponent(
+                shapes: [shape],
+                mass: 0,
+                material: .generate(staticFriction: 0.9, dynamicFriction: 0.8, restitution: 0.05),
+                mode: .static
+            ))
+        case .removed:
+            meshEntities.removeValue(forKey: anchor.id)?.removeFromParent()
         }
     }
 

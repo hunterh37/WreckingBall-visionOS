@@ -30,13 +30,25 @@ struct WreckingBallSceneBuilder: SceneBuilder {
         var towerBlockRows: Int = 8
         var blockSize: Float = 0.5
         var blockMass: Float = 18
-        var yardCenter: SIMD3<Float> = [0, 0, -4]
-        var yardRadius: Float = 2.2
+        // Towers spawn in a 360° ring centred under the ball's swing, between these
+        // fractions of the pendulum's horizontal reach so the ball can actually hit them.
+        var spawnRadiusRange: ClosedRange<Float> = 0.45...0.85
     }
 
     // Hook geometry shared by build-time placement and the control system's clamp box.
     static func neutralAnchorPosition(_ c: Config) -> SIMD3<Float> {
         [c.mastPosition.x, c.mastHeight - 1.2, c.mastPosition.z + (c.jibLength - 0.5)]
+    }
+
+    /// Length from the hook anchor to the ball's centre — the pendulum's swing radius.
+    static func pendulumLength(_ c: Config) -> Float {
+        Float(c.chainLinkCount) * c.chainLinkLength + c.ballRadius
+    }
+
+    /// Ground-plane point the ball swings around (anchor projected straight down).
+    static func swingPivotXZ(_ c: Config) -> SIMD2<Float> {
+        let a = neutralAnchorPosition(c)
+        return [a.x, a.z]
     }
 
     func build(_ config: Config, env: any SceneEnvironment) -> Entity {
@@ -127,8 +139,13 @@ struct WreckingBallSceneBuilder: SceneBuilder {
         anchor.position = neutral
         anchor.components.set(CraneAnchorComponent(
             neutralAnchorPosition: neutral,
-            minBound: [c.mastPosition.x - 5.5, c.mastHeight - 3.5, c.mastPosition.z + 0.8],
-            maxBound: [c.mastPosition.x + 5.5, c.mastHeight - 0.8, c.mastPosition.z + c.jibLength]
+            mastXZ: [c.mastPosition.x, c.mastPosition.z],
+            neutralRadius: c.jibLength - 0.5,
+            minRadius: 1.2,
+            maxRadius: c.jibLength - 0.3,
+            neutralHeight: c.mastHeight - 1.2,
+            minHeight: c.mastHeight - 3.5,
+            maxHeight: c.mastHeight - 0.8
         ))
         anchor.components.set(CollisionComponent(
             shapes: [.generateBox(size: [0.25, 0.25, 0.25])],
@@ -240,11 +257,17 @@ struct WreckingBallSceneBuilder: SceneBuilder {
             SimpleMaterial(color: palette[idx % palette.count], isMetallic: false)
         }
 
+        let pivot = swingPivotXZ(c)
+        let reach = pendulumLength(c)
+
         for t in 0..<c.towerCount {
+            // Even slices of the full circle, jittered, so towers ring the swing pivot at
+            // random 360° positions while staying within the ball's horizontal reach.
             let baseAngle = (Float(t) / Float(max(c.towerCount, 1))) * 2 * .pi
             let jitter = env.random.next(in: -0.4...0.4)
-            let radius = c.yardRadius * env.random.next(in: 0.7...1.0)
-            let center = c.yardCenter + SIMD3(cos(baseAngle + jitter), 0, sin(baseAngle + jitter)) * radius
+            let angle = baseAngle + jitter
+            let radius = reach * env.random.next(in: c.spawnRadiusRange)
+            let center = SIMD3(pivot.x + cos(angle) * radius, 0, pivot.y + sin(angle) * radius)
 
             let tower = Entity("tower_\(t)")
             let s = c.blockSize
@@ -295,7 +318,8 @@ struct WreckingBallSceneBuilder: SceneBuilder {
             barrel.name = "barrel_\(b)"
             barrel.components.set(TowerBlockComponent())
             let dir = env.random.unitVectorXZ()
-            barrel.position = c.yardCenter + dir * env.random.next(in: 0.4...1.4) + [0, 0.35, 0]
+            let r = reach * env.random.next(in: c.spawnRadiusRange)
+            barrel.position = SIMD3(pivot.x + dir.x * r, 0.35, pivot.y + dir.z * r)
             barrel.components.set(CollisionComponent(
                 shapes: [.generateCapsule(height: 0.7, radius: 0.22)],
                 filter: CollisionFilter(group: GameCollision.scenery, mask: .all)

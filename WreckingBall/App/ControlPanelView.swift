@@ -51,6 +51,11 @@ struct ControlPanelView: View {
                     }
                 }
 
+                Toggle(isOn: $viewModel.sceneCollisionsEnabled) {
+                    Label("Collide with Room", systemImage: "cube.transparent")
+                }
+                .fixedSize()
+
                 #if targetEnvironment(simulator)
                 Divider()
                 MockHandControls(hands: viewModel.mockHands)

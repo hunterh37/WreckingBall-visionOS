@@ -68,27 +68,30 @@ final class WreckingBallSceneTests: XCTestCase {
 
     // MARK: Crane control (scripted right hand)
 
-    func testCraneAnchorChasesHandWithAmplification() {
+    func testCraneSlewsFullCircle() {
         let hands = ScriptedHands()
         let env: CompositeSceneEnvironment = .fake(hands: hands)
         let scene = builder.makeScene(config, env: env)
         let anchor = scene["hookAnchor"]!
+        let jib = scene["jibPivot"]!
         let cfg = anchor.components[CraneAnchorComponent.self]!
 
-        // Move the hand 0.3 m right of neutral and let the smoothing converge.
-        hands.pointerTip = Transform(translation: cfg.neutralHandPosition + [0.3, 0, 0])
-        let clock = FrameClock()
-        let craneEntities = [anchor, scene["jibPivot"]!]
-        for _ in 0..<300 {
-            CraneControlSystem.step(entities: craneEntities[...], dt: clock.dt, env: env)
-            clock.tick()
+        // Swing the hand far enough left and right to drive the slew past ±90° — proving the
+        // crane reaches all the way around, not just a forward cone.
+        func settle(handX: Float) -> Float {
+            hands.pointerTip = Transform(translation: cfg.neutralHandPosition + [handX, 0, 0])
+            for _ in 0..<400 {
+                CraneControlSystem.step(entities: [anchor, jib][...], dt: 1.0 / 90.0, env: env)
+            }
+            let hook = anchor.position(relativeTo: nil)
+            return atan2(hook.x - cfg.mastXZ.x, hook.z - cfg.mastXZ.y)   // slew angle
         }
 
-        let expectedX = simd_clamp(
-            cfg.neutralAnchorPosition.x + 0.3 * cfg.amplification.x,
-            cfg.minBound.x, cfg.maxBound.x
-        )
-        XCTAssertEqual(anchor.position(relativeTo: nil).x, expectedX, accuracy: 0.02)
+        // Full-range hand sweep saturates the ±π clamp on either side.
+        XCTAssertEqual(settle(handX: 0.6), .pi, accuracy: 0.05)
+        XCTAssertEqual(settle(handX: -0.6), -.pi, accuracy: 0.05)
+        // A mid sweep lands well past the old ~60° limit (positive = jib swung to the right).
+        XCTAssertGreaterThan(settle(handX: 0.2), Float.pi / 2)
     }
 
     func testCraneAnchorStaysInsideEnvelope() {
@@ -98,14 +101,17 @@ final class WreckingBallSceneTests: XCTestCase {
         let anchor = scene["hookAnchor"]!
         let cfg = anchor.components[CraneAnchorComponent.self]!
 
-        // Fling the hand absurdly far — the hook must clamp to its envelope.
+        // Fling the hand absurdly far — reach and height must clamp to their limits.
         hands.pointerTip = Transform(translation: [50, -30, 80])
         for _ in 0..<600 {
             CraneControlSystem.step(entities: [anchor][...], dt: 1.0 / 90.0, env: env)
         }
         let p = anchor.position(relativeTo: nil)
-        XCTAssertTrue(all(p .>= cfg.minBound - 0.001) && all(p .<= cfg.maxBound + 0.001),
-                      "anchor escaped envelope: \(p)")
+        let reach = length(SIMD2<Float>(p.x, p.z) - cfg.mastXZ)
+        XCTAssertLessThanOrEqual(reach, cfg.maxRadius + 0.01)
+        XCTAssertGreaterThanOrEqual(reach, cfg.minRadius - 0.01)
+        XCTAssertTrue(p.y >= cfg.minHeight - 0.01 && p.y <= cfg.maxHeight + 0.01,
+                      "hook height escaped envelope: \(p.y)")
     }
 
     func testJibSlewsTowardHook() {

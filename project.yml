@@ -2,7 +2,7 @@ name: WreckingBall
 options:
   bundleIdPrefix: com.hunter
   deploymentTarget:
-    visionOS: "2.0"
+    visionOS: "26.0"
 
 packages:
   ImmersiveTesting:

@@ -36,10 +36,19 @@ struct CraneControlSystem: System {
               let cfg = anchor.components[CraneAnchorComponent.self]
         else { return }
 
-        // 1. Hand → target hook position.
+        // 1. Hand → target hook position, in polar coords around the mast so the crane can
+        //    slew the full 360°: left/right hand = azimuth, forward/back = reach, up/down =
+        //    height. (A box mapping could only ever cover a forward cone.)
         let hand = env.hands.pointerTipTransform().translation
-        var target = cfg.neutralAnchorPosition + (hand - cfg.neutralHandPosition) * cfg.amplification
-        target = clamp(target, min: cfg.minBound, max: cfg.maxBound)
+        let handDelta = hand - cfg.neutralHandPosition
+        let yaw = simd_clamp(handDelta.x * cfg.yawGain, -.pi, .pi)
+        let radius = simd_clamp(cfg.neutralRadius - handDelta.z * cfg.radiusGain,
+                                cfg.minRadius, cfg.maxRadius)
+        let height = simd_clamp(cfg.neutralHeight + handDelta.y * cfg.heightGain,
+                                cfg.minHeight, cfg.maxHeight)
+        let target = SIMD3<Float>(cfg.mastXZ.x + sin(yaw) * radius,
+                                  height,
+                                  cfg.mastXZ.y + cos(yaw) * radius)
 
         // 2. Smooth, framerate-independent chase. The anchor is kinematic, so the joint
         //    chain converts this motion into real momentum on the ball.

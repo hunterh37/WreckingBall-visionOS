@@ -26,6 +26,12 @@ final class GameViewModel {
     var towerCount: Int = 3
     var towerHeight: Int = 8
 
+    /// Whether the wrecking ball and rubble collide with the real-world scene mesh. Off by
+    /// default; toggled from the control panel. Drives the mesh container's `isEnabled`.
+    var sceneCollisionsEnabled: Bool = false {
+        didSet { tracking.sceneMeshRoot.isEnabled = sceneCollisionsEnabled }
+    }
+
     init() {
         // World tracking always comes from the live adapter (it self-defaults on simulator).
         // Hand input is mocked on the simulator and real on device.
@@ -40,6 +46,10 @@ final class GameViewModel {
             random: SystemRandom()
         )
         root = WreckingBallSceneBuilder().build(config, env: environment)
+        // The world-mesh collision bodies must live under the physics root so the ball and
+        // rubble collide with real walls. The service populates this container as scene
+        // reconstruction streams mesh anchors in.
+        root.addChild(tracking.sceneMeshRoot)
         CraneControlSystem.environment = environment
     }
 

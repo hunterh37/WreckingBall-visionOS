@@ -23,7 +23,7 @@ final class MockHandTracking: HandTrackingProviding {
     private let neutralHand = SIMD3<Float>(0.25, 1.05, -0.45)
 
     /// How far the joystick can push the hand from neutral, per axis (metres). The crane's
-    /// own amplification turns this small reach into the full hook envelope.
+    /// polar control maps this small reach onto a full 360° slew, full reach, and full lift.
     private let reach = SIMD3<Float>(0.4, 0.4, 0.4)
 
     /// Joystick: x = left/right (→ hand X), y = forward/back (→ hand −Z). Range −1...1.

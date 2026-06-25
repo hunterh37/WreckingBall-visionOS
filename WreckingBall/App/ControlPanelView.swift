@@ -8,11 +8,21 @@ struct ControlPanelView: View {
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @State private var yardIsOpen = false
 
+    private var timeString: String {
+        String(format: "0:%02d", Int(viewModel.timeRemaining.rounded(.up)))
+    }
+
+    private var styleBinding: Binding<StructureBuilder.Cityscape?> {
+        Binding(get: { viewModel.pinnedStyle }, set: { viewModel.pinnedStyle = $0 })
+    }
+
     var body: some View {
         VStack(spacing: 20) {
             Text("Wrecking Ball")
                 .font(.extraLargeTitle2)
-            Text("Move your right hand to swing the crane. Knock the towers down.")
+            Text(viewModel.controlMode == .joystick
+                 ? "Grab the joystick rig to swing the crane. Knock the towers down."
+                 : "Move your right hand to swing the crane. Knock the towers down.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -32,23 +42,61 @@ struct ControlPanelView: View {
             if yardIsOpen {
                 Divider()
 
-                HStack(spacing: 16) {
-                    Stepper("Towers: \(viewModel.towerCount)", value: $viewModel.towerCount, in: 1...6)
-                    Stepper("Height: \(viewModel.towerHeight)", value: $viewModel.towerHeight, in: 3...14)
+                Text(viewModel.cityStyle.label.uppercased())
+                    .font(.caption).tracking(2).foregroundStyle(.secondary)
+
+                HStack(spacing: 28) {
+                    VStack {
+                        Text(timeString).font(.largeTitle).bold().monospacedDigit()
+                            .foregroundStyle(viewModel.timeRemaining <= 5 ? .red : .primary)
+                        Text("Time").font(.caption2).foregroundStyle(.secondary)
+                    }
+                    VStack {
+                        Text("\(viewModel.score)").font(.largeTitle).bold().monospacedDigit()
+                        Text("Score").font(.caption2).foregroundStyle(.secondary)
+                    }
+                    VStack {
+                        Text("\(viewModel.crittersRemaining)").font(.largeTitle).bold().monospacedDigit()
+                        Text("Aliens").font(.caption2).foregroundStyle(.secondary)
+                    }
                 }
+
+                if viewModel.roundOver {
+                    Text("Time! Demolished \(viewModel.score) 🧨")
+                        .font(.headline)
+                }
+
+                Button {
+                    viewModel.startRound()
+                } label: {
+                    Label(viewModel.isRoundActive ? "Restart Round" : "New Round (30s)",
+                          systemImage: "arrow.clockwise")
+                }
+                .font(.title3)
+
+                Picker("Neighborhood", selection: styleBinding) {
+                    Text("Random").tag(StructureBuilder.Cityscape?.none)
+                    ForEach(StructureBuilder.Cityscape.allCases) { style in
+                        Text(style.label).tag(StructureBuilder.Cityscape?.some(style))
+                    }
+                }
+                .pickerStyle(.segmented)
                 .fixedSize()
 
-                HStack(spacing: 16) {
-                    Button {
-                        viewModel.respawnTowers()
-                    } label: {
-                        Label("Respawn Towers", systemImage: "building.2")
+                Divider()
+
+                Picker("Control", selection: $viewModel.controlMode) {
+                    ForEach(CraneControlMode.allCases) { mode in
+                        Label(mode.label, systemImage: mode.systemImage).tag(mode)
                     }
-                    Button {
-                        viewModel.resetBall()
-                    } label: {
-                        Label("Reset Ball", systemImage: "arrow.counterclockwise.circle")
-                    }
+                }
+                .pickerStyle(.segmented)
+                .fixedSize()
+
+                Button {
+                    viewModel.resetBall()
+                } label: {
+                    Label("Reset Ball", systemImage: "arrow.counterclockwise.circle")
                 }
 
                 Toggle(isOn: $viewModel.sceneCollisionsEnabled) {
@@ -57,8 +105,16 @@ struct ControlPanelView: View {
                 .fixedSize()
 
                 #if targetEnvironment(simulator)
-                Divider()
-                MockHandControls(hands: viewModel.mockHands)
+                if viewModel.controlMode == .handTracking {
+                    Divider()
+                    MockHandControls(hands: viewModel.mockHands)
+                } else {
+                    Divider()
+                    Text("Joystick mode — drag a stick head on the rig in the yard.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
                 #endif
             }
         }

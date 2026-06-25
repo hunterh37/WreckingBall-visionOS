@@ -41,6 +41,12 @@ final class SpatialTrackingService: WorldTrackingProviding, HandTrackingProvidin
     private(set) var rightPinchDistance: Float = 1
     private(set) var leftPinchDistance: Float = 1
 
+    /// World-space pinch points (thumb–index midpoint) per hand, refreshed each update. Let
+    /// the joystick rig be grabbed by hand on device. Gate on the pinch distances above to
+    /// decide whether a hand is actually pinching.
+    private(set) var rightPinchPosition: SIMD3<Float> = [0.25, 1.05, -0.45]
+    private(set) var leftPinchPosition: SIMD3<Float> = [-0.25, 1.05, -0.45]
+
     // MARK: Session
 
     /// Starts tracking and consumes hand + scene-reconstruction updates until cancelled.
@@ -121,12 +127,15 @@ final class SpatialTrackingService: WorldTrackingProviding, HandTrackingProvidin
         }
         let index = worldPosition(.indexFingerTip)
         let thumb = worldPosition(.thumbTip)
+        let pinch = (index + thumb) / 2
         switch anchor.chirality {
         case .right:
             rightPinchDistance = distance(index, thumb)
             rightIndexTip = Transform(translation: index)
+            rightPinchPosition = pinch
         case .left:
             leftPinchDistance = distance(index, thumb)
+            leftPinchPosition = pinch
         }
     }
 

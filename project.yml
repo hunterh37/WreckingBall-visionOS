@@ -7,6 +7,11 @@ options:
 packages:
   ImmersiveTesting:
     path: ../ImmersiveTesting
+  DicyaninVirtualJoystick:
+    # Vendored as a sibling local package (cloned from
+    # https://github.com/hunterh37/DicyaninVirtualJoystick at tag 1.0.1), mirroring how
+    # ImmersiveTesting is referenced. Swap back to `url:`/`from:` if you prefer remote SPM.
+    path: ../DicyaninVirtualJoystick
 
 settings:
   base:
@@ -22,6 +27,8 @@ targets:
     dependencies:
       - package: ImmersiveTesting
         product: ImmersiveTestingRuntime
+      - package: DicyaninVirtualJoystick
+        product: DicyaninVirtualJoystick
     info:
       path: WreckingBall/Info.plist
       properties:

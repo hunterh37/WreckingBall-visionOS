@@ -13,12 +13,17 @@
 		568AD2B5B02CC49C0096F08C /* ImmersiveTestingRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 172CB78970EAFB15042E644E /* ImmersiveTestingRuntime */; };
 		5A3FDB1BAAAA123154566156 /* CraneControlSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA81786A2B210E255AC8A8C7 /* CraneControlSystem.swift */; };
 		5B1AFDAAA18CECAC265FF490 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A894FCB91B920391AFDA9FD /* Components.swift */; };
+		65DA321F552CE507DDBDDAAF /* StructureBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC59D4D983B88A5A7CF73AB9 /* StructureBuilder.swift */; };
 		72A4BC2FDFDBF5084CEC69C6 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096821AE238A07DEE4F8F98B /* GameViewModel.swift */; };
 		99D5378BD8BBDE2D25F3A9E1 /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FCAEF1F860076622FEC5D7 /* ControlPanelView.swift */; };
+		A5DAAC23A5CEC87B3CD40D2C /* JoystickHandTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D9C7CB62AF60FD37FE381F /* JoystickHandTracking.swift */; };
 		B1567AF91EA6F16B56C14B96 /* MockHandTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6010793EBFB9CD4B42173D /* MockHandTracking.swift */; };
+		BE4D3E075B6123B62683F505 /* Critters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB76AE701DE0E5DCFBE8597 /* Critters.swift */; };
 		C8257E7E3EE88B026F14D001 /* ImmersiveTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 36FB36A98B33D08F0AE600FE /* ImmersiveTesting */; };
 		C86B8BE48E9349DDB3B800C2 /* WreckingBallSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C874C89067BCCC795344249 /* WreckingBallSceneTests.swift */; };
+		D98E33306C740AA6E1DEDEBE /* HandInputRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20087DA834611D2EA1C900A8 /* HandInputRouter.swift */; };
 		E51217E95E88CA288F450D4F /* WreckingBallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EAB34E47BA181183E0710F /* WreckingBallApp.swift */; };
+		F1988711FC35CB09481ACBD3 /* DicyaninVirtualJoystick in Frameworks */ = {isa = PBXBuildFile; productRef = DFE1BBDCDB2C13618B78C522 /* DicyaninVirtualJoystick */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,16 +39,21 @@
 /* Begin PBXFileReference section */
 		096821AE238A07DEE4F8F98B /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 		10EAB34E47BA181183E0710F /* WreckingBallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WreckingBallApp.swift; sourceTree = "<group>"; };
+		20087DA834611D2EA1C900A8 /* HandInputRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandInputRouter.swift; sourceTree = "<group>"; };
 		4620344143BC7AF3E45CA1EF /* ImmersiveTesting */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ImmersiveTesting; path = ../ImmersiveTesting; sourceTree = SOURCE_ROOT; };
 		515E3048E64C8F7285EB08A2 /* SpatialTrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialTrackingService.swift; sourceTree = "<group>"; };
 		520389FA2955730C1E4E5008 /* ImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveView.swift; sourceTree = "<group>"; };
 		6A894FCB91B920391AFDA9FD /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		75FCAEF1F860076622FEC5D7 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
 		7C874C89067BCCC795344249 /* WreckingBallSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WreckingBallSceneTests.swift; sourceTree = "<group>"; };
-		B05170F558CF8B8B8AE91A2D /* WreckingBall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WreckingBall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		97D9C7CB62AF60FD37FE381F /* JoystickHandTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickHandTracking.swift; sourceTree = "<group>"; };
+		9FB76AE701DE0E5DCFBE8597 /* Critters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Critters.swift; sourceTree = "<group>"; };
+		AC59D4D983B88A5A7CF73AB9 /* StructureBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructureBuilder.swift; sourceTree = "<group>"; };
+		B05170F558CF8B8B8AE91A2D /* WreckingBall.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WreckingBall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA81786A2B210E255AC8A8C7 /* CraneControlSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CraneControlSystem.swift; sourceTree = "<group>"; };
 		E7FD649C0FE9FD2D56EBFA38 /* WreckingBallTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = WreckingBallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED6010793EBFB9CD4B42173D /* MockHandTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockHandTracking.swift; sourceTree = "<group>"; };
+		F623A06D87F06F127FFB77C1 /* DicyaninVirtualJoystick */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DicyaninVirtualJoystick; path = ../DicyaninVirtualJoystick; sourceTree = SOURCE_ROOT; };
 		F81237AE68643B1BCA1E6DDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		FBE57A94E9E4992646A7CC29 /* WreckingBallSceneBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WreckingBallSceneBuilder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -54,6 +64,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				568AD2B5B02CC49C0096F08C /* ImmersiveTestingRuntime in Frameworks */,
+				F1988711FC35CB09481ACBD3 /* DicyaninVirtualJoystick in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +111,7 @@
 		2A93EB11476E009484C71BA6 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				F623A06D87F06F127FFB77C1 /* DicyaninVirtualJoystick */,
 				4620344143BC7AF3E45CA1EF /* ImmersiveTesting */,
 			);
 			name = Packages;
@@ -117,6 +129,8 @@
 		34DE774CD831C74D0EF276DB /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				20087DA834611D2EA1C900A8 /* HandInputRouter.swift */,
+				97D9C7CB62AF60FD37FE381F /* JoystickHandTracking.swift */,
 				ED6010793EBFB9CD4B42173D /* MockHandTracking.swift */,
 				515E3048E64C8F7285EB08A2 /* SpatialTrackingService.swift */,
 			);
@@ -128,7 +142,9 @@
 			children = (
 				6A894FCB91B920391AFDA9FD /* Components.swift */,
 				CA81786A2B210E255AC8A8C7 /* CraneControlSystem.swift */,
+				9FB76AE701DE0E5DCFBE8597 /* Critters.swift */,
 				096821AE238A07DEE4F8F98B /* GameViewModel.swift */,
+				AC59D4D983B88A5A7CF73AB9 /* StructureBuilder.swift */,
 				FBE57A94E9E4992646A7CC29 /* WreckingBallSceneBuilder.swift */,
 			);
 			path = Game;
@@ -161,6 +177,7 @@
 			name = WreckingBall;
 			packageProductDependencies = (
 				172CB78970EAFB15042E644E /* ImmersiveTestingRuntime */,
+				DFE1BBDCDB2C13618B78C522 /* DicyaninVirtualJoystick */,
 			);
 			productName = WreckingBall;
 			productReference = B05170F558CF8B8B8AE91A2D /* WreckingBall.app */;
@@ -194,6 +211,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 3D833D4DC103FA255891603F /* Build configuration list for PBXProject "WreckingBall" */;
 			developmentRegion = en;
@@ -205,6 +224,7 @@
 			mainGroup = C01F411DE266C6223FC17309;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				E393FF234693B8FA99A17DBD /* XCLocalSwiftPackageReference "../DicyaninVirtualJoystick" */,
 				1FA73F6A6D00418E6F9EC45A /* XCLocalSwiftPackageReference "../ImmersiveTesting" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -234,10 +254,14 @@
 				5B1AFDAAA18CECAC265FF490 /* Components.swift in Sources */,
 				99D5378BD8BBDE2D25F3A9E1 /* ControlPanelView.swift in Sources */,
 				5A3FDB1BAAAA123154566156 /* CraneControlSystem.swift in Sources */,
+				BE4D3E075B6123B62683F505 /* Critters.swift in Sources */,
 				72A4BC2FDFDBF5084CEC69C6 /* GameViewModel.swift in Sources */,
+				D98E33306C740AA6E1DEDEBE /* HandInputRouter.swift in Sources */,
 				17AF8D87A8E4328ADE813FE7 /* ImmersiveView.swift in Sources */,
+				A5DAAC23A5CEC87B3CD40D2C /* JoystickHandTracking.swift in Sources */,
 				B1567AF91EA6F16B56C14B96 /* MockHandTracking.swift in Sources */,
 				1B1487870E07FD9D035ED357 /* SpatialTrackingService.swift in Sources */,
+				65DA321F552CE507DDBDDAAF /* StructureBuilder.swift in Sources */,
 				E51217E95E88CA288F450D4F /* WreckingBallApp.swift in Sources */,
 				2D5B65267DBB7460A8ED5AA8 /* WreckingBallSceneBuilder.swift in Sources */,
 			);
@@ -396,7 +420,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = NWR2UZ4V67;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = WreckingBall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -430,7 +453,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = NWR2UZ4V67;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = WreckingBall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -480,6 +502,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../ImmersiveTesting;
 		};
+		E393FF234693B8FA99A17DBD /* XCLocalSwiftPackageReference "../DicyaninVirtualJoystick" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../DicyaninVirtualJoystick;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -490,6 +516,10 @@
 		36FB36A98B33D08F0AE600FE /* ImmersiveTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ImmersiveTesting;
+		};
+		DFE1BBDCDB2C13618B78C522 /* DicyaninVirtualJoystick */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DicyaninVirtualJoystick;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

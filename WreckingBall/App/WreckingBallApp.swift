@@ -1,5 +1,6 @@
 import SwiftUI
 import RealityKit
+import DicyaninVirtualJoystick
 
 @main
 struct WreckingBallApp: App {
@@ -14,7 +15,15 @@ struct WreckingBallApp: App {
         WreckingBallComponent.registerComponent()
         ChainLinkComponent.registerComponent()
         TowerBlockComponent.registerComponent()
+        AlienCritterComponent.registerComponent()
         CraneControlSystem.registerSystem()
+        CritterPopSystem.registerSystem()
+
+        // DicyaninVirtualJoystick rig: register its components + driving system so the
+        // world-anchored joystick stand simulates each frame when that scheme is active.
+        Gamepad3DJoystickComponent.registerComponent()
+        Gamepad3DHeadComponent.registerComponent()
+        Gamepad3DSystem.registerSystem()
     }
 
     var body: some SwiftUI.Scene {

@@ -31,7 +31,7 @@ struct WreckingBallApp: App {
             ControlPanelView(viewModel: viewModel)
         }
         .windowStyle(.plain)
-        .defaultSize(width: 420, height: 340)
+        .defaultSize(width: 560, height: 760)
 
         ImmersiveSpace(id: "demolitionYard") {
             ImmersiveView(viewModel: viewModel)

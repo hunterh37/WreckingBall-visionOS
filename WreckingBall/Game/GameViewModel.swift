@@ -39,6 +39,7 @@ final class GameViewModel {
         didSet {
             router.mode = controlMode
             gamepadPillar.isEnabled = (controlMode == .joystick)
+            joystickHands.reset()
         }
     }
 
@@ -107,6 +108,8 @@ final class GameViewModel {
         CraneControlSystem.environment = environment
         wireJoystickBridge()
 
+        CritterPopSystem.rootEntity = root
+
         // Bonus points + population bookkeeping whenever the pop system bonks a critter.
         // Fired from the simulation update, so hop to the main actor.
         CritterPopSystem.onPop = { [weak self] in
@@ -174,7 +177,7 @@ final class GameViewModel {
         blocksRemaining = initialBlockCount
     }
 
-    /// Score = blocks knocked loose this round + 5 per bonked critter. Recomputed on the tick.
+    /// Score = blocks knocked loose this round + 1000 per bonked critter. Recomputed on the tick.
     private func recomputeScore() {
         guard let city = root.findEntity(named: "structures") else { return }
         var toppled = 0
@@ -183,7 +186,7 @@ final class GameViewModel {
             if distance(block.position(relativeTo: nil), origin) > 0.18 { toppled += 1 }
         }
         blocksRemaining = max(initialBlockCount - toppled, 0)
-        score = toppled + crittersBonked * 5
+        score = toppled + crittersBonked * 1000
     }
 
     private func forEachBlock(in entity: Entity, _ body: (Entity) -> Void) {
@@ -232,6 +235,7 @@ final class GameViewModel {
 
     /// Hangs the ball and chain straight back under the hook and kills their momentum.
     func resetBall() {
+        joystickHands.reset()
         guard let anchor = root.findEntity(named: "hookAnchor") else { return }
         let top = anchor.position(relativeTo: nil)
         for i in 0..<config.chainLinkCount {

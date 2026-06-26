@@ -181,12 +181,12 @@ struct WreckingBallSceneBuilder: SceneBuilder {
             ))
             var body = PhysicsBodyComponent(
                 shapes: [.generateBox(width: 0.09, height: c.chainLinkLength, depth: 0.09)],
-                mass: 30,
+                mass: 80,
                 material: .generate(staticFriction: 0.5, dynamicFriction: 0.5, restitution: 0),
                 mode: .dynamic
             )
-            body.linearDamping = 0.15
-            body.angularDamping = 0.4
+            body.linearDamping = 0.8
+            body.angularDamping = 15
             link.components.set(body)
             assembly.addChild(link)
         }
@@ -211,27 +211,32 @@ struct WreckingBallSceneBuilder: SceneBuilder {
             mode: .dynamic
         )
         ballBody.linearDamping = 0.05
-        ballBody.angularDamping = 0.1
+        ballBody.angularDamping = 0.5
         ball.components.set(ballBody)
         assembly.addChild(ball)
         return assembly
     }
 
-    /// Pins anchor → links → ball with spherical joints. Call once the root is inside a
-    /// live scene (RealityView's make closure); joints can't register before that.
+    /// Pins anchor → links → ball. All inter-link joints are fixed (rigid chain) so
+    /// only two spherical joints exist — hook→chain and chain→ball — which eliminates
+    /// the serial-chain instability that made the chain go crazy under load.
     @discardableResult
     static func connectJoints(root: Entity, config: Config = Config()) throws -> Int {
         guard let anchor = root.findEntity(named: "hookAnchor") else { return 0 }
         let half = config.chainLinkLength / 2
         var jointCount = 0
         var upper = anchor
-        var upperPinOffset: SIMD3<Float> = [0, -0.12, 0]    // bottom of the hook block
+        var upperPinOffset: SIMD3<Float> = [0, -0.12, 0]
 
         for i in 0..<config.chainLinkCount {
             guard let link = root.findEntity(named: "chainLink_\(i)") else { break }
             let pin0 = upper.pins.set(named: "toLink\(i)", position: upperPinOffset)
             let pin1 = link.pins.set(named: "top", position: [0, half, 0])
-            try PhysicsSphericalJoint(pin0: pin0, pin1: pin1).addToSimulation()
+            if i == 0 {
+                try PhysicsSphericalJoint(pin0: pin0, pin1: pin1).addToSimulation()
+            } else {
+                try PhysicsFixedJoint(pin0: pin0, pin1: pin1).addToSimulation()
+            }
             jointCount += 1
             upper = link
             upperPinOffset = [0, -half, 0]

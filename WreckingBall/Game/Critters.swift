@@ -162,6 +162,9 @@ struct CritterPopSystem: System {
     /// Set once by the game model; receives +1 per critter popped (on the main actor).
     @MainActor static var onPop: (() -> Void)?
 
+    /// Weak reference to the scene root entity so temporary effect entities can be added as children.
+    @MainActor static weak var rootEntity: Entity?
+
     init(scene: RealityKit.Scene) {}
 
     private static let critterQuery = EntityQuery(where: .has(AlienCritterComponent.self))
@@ -189,13 +192,110 @@ struct CritterPopSystem: System {
             }
             guard let ballPos else { continue }
             if distance(critter.position(relativeTo: nil), ballPos) <= ballRadius + c.radius + 0.05 {
+                let pos = critter.position(relativeTo: nil)
                 c.popped = true
                 c.popTimer = 0.25
                 critter.components.set(c)
                 critter.components.remove(PhysicsBodyComponent.self)
                 critter.components.remove(CollisionComponent.self)
+                spawnPoof(at: pos)
+                spawnScoreText(at: pos)
+                playPopSound(at: pos)
                 onPop?()
             }
+        }
+    }
+
+    // MARK: Pop VFX
+
+    @MainActor
+    private static var popSound: AudioFileResource? = {
+        guard let url = Bundle.main.url(forResource: "pop", withExtension: "wav") else { return nil }
+        return try? AudioFileResource.load(contentsOf: url)
+    }()
+
+    @MainActor
+    private static func spawnPoof(at position: SIMD3<Float>) {
+        guard let root = rootEntity else { return }
+        let smoke = Entity()
+        smoke.position = position
+        smoke.name = "poof_smoke"
+
+        var particles = ParticleEmitterComponent()
+        particles.emitterShape = .sphere
+        particles.emitterShapeSize = [0.05, 0.05, 0.05]
+        particles.speed = 0.25
+        particles.speedVariation = 0.12
+        particles.emissionDirection = [0, 1, 0]
+        particles.mainEmitter.birthRate = 500
+        particles.mainEmitter.lifeSpan = 0.6
+        particles.mainEmitter.lifeSpanVariation = 0.2
+        particles.mainEmitter.size = 0.06
+        particles.mainEmitter.sizeVariation = 0.04
+        particles.mainEmitter.sizeMultiplierAtEndOfLifespan = 2.0
+        particles.mainEmitter.opacityCurve = .linearFadeOut
+        particles.mainEmitter.blendMode = .alpha
+        particles.mainEmitter.color = .evolving(
+            start: .single(UIColor(red: 0.20, green: 1.0, blue: 0.45, alpha: 0.9)),
+            end: .single(UIColor(red: 0.0, green: 0.4, blue: 0.1, alpha: 0.0))
+        )
+        particles.timing = .once(warmUp: 0, emit: .init(duration: 0.3, variation: 0.1))
+
+        smoke.components.set(particles)
+        root.addChild(smoke)
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.0))
+            smoke.removeFromParent()
+        }
+    }
+
+    @MainActor
+    private static func spawnScoreText(at position: SIMD3<Float>) {
+        guard let root = rootEntity else { return }
+
+        let textMesh = MeshResource.generateText(
+            "+1000",
+            extrusionDepth: 0.015,
+            font: .systemFont(ofSize: 0.08),
+            containerFrame: .zero,
+            alignment: .center,
+            lineBreakMode: .byWordWrapping
+        )
+
+        var mat = PhysicallyBasedMaterial()
+        mat.baseColor = .init(tint: UIColor(red: 0.3, green: 1.0, blue: 0.5, alpha: 1))
+        mat.emissiveColor = .init(color: UIColor(red: 0.2, green: 1.0, blue: 0.4, alpha: 0.8))
+        mat.emissiveIntensity = 2.0
+        mat.blending = .transparent(opacity: 1.0)
+
+        let textEntity = ModelEntity(mesh: textMesh, materials: [mat])
+        textEntity.position = position + [0, 0.25, 0]
+        textEntity.name = "score_text"
+
+        root.addChild(textEntity)
+
+        let up = position + [0, 0.9, 0]
+        textEntity.move(to: Transform(translation: up), relativeTo: nil, duration: 1.2, timingFunction: .easeOut)
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.5))
+            textEntity.removeFromParent()
+        }
+    }
+
+    @MainActor
+    private static func playPopSound(at position: SIMD3<Float>) {
+        guard let root = rootEntity, let sound = popSound else { return }
+        let audioEntity = Entity()
+        audioEntity.position = position
+        root.addChild(audioEntity)
+        let controller = audioEntity.prepareAudio(sound)
+        controller.play()
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(0.5))
+            audioEntity.removeFromParent()
         }
     }
 }

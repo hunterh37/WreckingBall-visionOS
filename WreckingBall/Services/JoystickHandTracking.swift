@@ -3,6 +3,7 @@ import simd
 import Observation
 import DicyaninVirtualJoystick
 import ImmersiveTestingRuntime
+import QuartzCore
 
 // MARK: - JoystickHandTracking
 //
@@ -34,11 +35,18 @@ final class JoystickHandTracking: HandTrackingProviding {
     /// full lift.
     private let reach = SIMD3<Float>(0.4, 0.4, 0.4)
 
-    /// Planar stick (right joystick): x = slew, y = reach. Range roughly −1...1.
+    /// Units-per-second rate at which full stick deflection moves the integrated position.
+    /// At 1.5 the crane travels from center to the edge of its range in ~0.67 s.
+    private let speed: Float = 1.5
+
+    /// Integrated planar position (x = slew, y = reach). Clamped to −1…1 on each axis.
     private(set) var planar: SIMD2<Float> = .zero
 
-    /// Vertical channel (left joystick Y): up/down hook travel. Range −1...1.
+    /// Integrated vertical position. Clamped to −1…1.
     private(set) var elevation: Float = 0
+
+    /// Timestamp of the previous `apply` call, used to compute dt without a fixed frame rate.
+    private var lastApplyTime: Double = CACurrentMediaTime()
 
     var rightPinchDistance: Float { 1 }
     var leftPinchDistance: Float { 1 }
@@ -52,14 +60,32 @@ final class JoystickHandTracking: HandTrackingProviding {
         return Transform(translation: neutralHand + offset)
     }
 
+    /// Reset integrated positions to centre — call on round reset or control-mode change.
+    func reset() {
+        planar = .zero
+        elevation = 0
+        lastApplyTime = CACurrentMediaTime()
+    }
+
     /// Fold one frame of joystick output into the hand model. Wired to
     /// `VirtualJoystickBridge.output` by `GameViewModel`.
+    ///
+    /// Stick deflection is treated as a *velocity*: each call integrates `stick * speed * dt`
+    /// into the accumulated position so the crane moves continuously in the pointed direction
+    /// rather than snapping to the stick's absolute offset.
     func apply(_ input: VirtualJoystickInput) {
+        let now = CACurrentMediaTime()
+        let dt = Float(min(now - lastApplyTime, 0.05))   // cap at 50 ms to survive hitches
+        lastApplyTime = now
+
         if input.rightActive {
-            planar = SIMD2(input.rightDirection.x, input.rightDirection.y) * input.rightMagnitude
-        } else {
-            planar = .zero
+            let vel = SIMD2(input.rightDirection.x, input.rightDirection.y)
+                        * input.rightMagnitude * speed * dt
+            planar = clamp(planar + vel, min: SIMD2(repeating: -1), max: SIMD2(repeating: 1))
         }
-        elevation = input.leftActive ? input.leftDirection.y * input.leftMagnitude : 0
+        if input.leftActive {
+            let vel = input.leftDirection.y * input.leftMagnitude * speed * dt
+            elevation = max(-1, min(1, elevation + vel))
+        }
     }
 }

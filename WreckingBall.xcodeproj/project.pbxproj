@@ -15,6 +15,8 @@
 		5B1AFDAAA18CECAC265FF490 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A894FCB91B920391AFDA9FD /* Components.swift */; };
 		65DA321F552CE507DDBDDAAF /* StructureBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC59D4D983B88A5A7CF73AB9 /* StructureBuilder.swift */; };
 		72A4BC2FDFDBF5084CEC69C6 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096821AE238A07DEE4F8F98B /* GameViewModel.swift */; };
+		9215566A770A9315D5A13A9C /* pop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6E1CC1CC94FA0EF0F7075EF3 /* pop.wav */; };
+		A1B2C3D4E5F600000000A001 /* wreckingball.png in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000F001 /* wreckingball.png */; };
 		99D5378BD8BBDE2D25F3A9E1 /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FCAEF1F860076622FEC5D7 /* ControlPanelView.swift */; };
 		A5DAAC23A5CEC87B3CD40D2C /* JoystickHandTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D9C7CB62AF60FD37FE381F /* JoystickHandTracking.swift */; };
 		B1567AF91EA6F16B56C14B96 /* MockHandTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6010793EBFB9CD4B42173D /* MockHandTracking.swift */; };
@@ -44,6 +46,8 @@
 		515E3048E64C8F7285EB08A2 /* SpatialTrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialTrackingService.swift; sourceTree = "<group>"; };
 		520389FA2955730C1E4E5008 /* ImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveView.swift; sourceTree = "<group>"; };
 		6A894FCB91B920391AFDA9FD /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		6E1CC1CC94FA0EF0F7075EF3 /* pop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = pop.wav; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000F001 /* wreckingball.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wreckingball.png; sourceTree = "<group>"; };
 		75FCAEF1F860076622FEC5D7 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
 		7C874C89067BCCC795344249 /* WreckingBallSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WreckingBallSceneTests.swift; sourceTree = "<group>"; };
 		97D9C7CB62AF60FD37FE381F /* JoystickHandTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickHandTracking.swift; sourceTree = "<group>"; };
@@ -95,6 +99,7 @@
 				F81237AE68643B1BCA1E6DDD /* Info.plist */,
 				09B97D5BA6E48CCA0F5E045C /* App */,
 				B6DB7CF6C393BF8D03A8E774 /* Game */,
+				97333B2A557A07248C145985 /* Resources */,
 				34DE774CD831C74D0EF276DB /* Services */,
 			);
 			path = WreckingBall;
@@ -137,6 +142,15 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		97333B2A557A07248C145985 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6E1CC1CC94FA0EF0F7075EF3 /* pop.wav */,
+				A1B2C3D4E5F600000000F001 /* wreckingball.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		B6DB7CF6C393BF8D03A8E774 /* Game */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +182,7 @@
 			buildConfigurationList = 7A609325C475550198DF480F /* Build configuration list for PBXNativeTarget "WreckingBall" */;
 			buildPhases = (
 				ECF07DD99C94B89ACCC03F35 /* Sources */,
+				BB3D255DB706BCACC9879740 /* Resources */,
 				0C58568DE07CB645AF1F2B3C /* Frameworks */,
 			);
 			buildRules = (
@@ -237,6 +252,18 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BB3D255DB706BCACC9879740 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9215566A770A9315D5A13A9C /* pop.wav in Resources */,
+				A1B2C3D4E5F600000000A001 /* wreckingball.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		168FA4E52017CCB48D3159FF /* Sources */ = {
